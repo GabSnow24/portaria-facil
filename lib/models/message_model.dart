@@ -14,26 +14,47 @@ class Message {
       required this.id});
 }
 
-final User currentUser =
-    User(id: 0, name: 'Gabriel', imageUrl: 'assets/images/porteiro.jpg/');
+final User currentUser = User(
+    id: 0,
+    name: 'Gabriel',
+    imageUrl: 'assets/images/porteiro.jpg/',
+    isOnline: true);
 
-final User adryUser =
-    User(id: 1, name: 'Adry', imageUrl: 'assets/images/porteiro.jpg');
+final User adryUser = User(
+    id: 1,
+    name: 'Adry',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
-final User queirozUser =
-    User(id: 2, name: 'Joseph', imageUrl: 'assets/images/porteiro.jpg');
+final User queirozUser = User(
+    id: 2,
+    name: 'Joseph',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
-final User dorinhoUser =
-    User(id: 3, name: 'Dorinho', imageUrl: 'assets/images/porteiro.jpg');
+final User dorinhoUser = User(
+    id: 3,
+    name: 'Dorinho',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
-final User fpUser =
-    User(id: 4, name: 'Fillipinho', imageUrl: 'assets/images/porteiro.jpg');
+final User fpUser = User(
+    id: 4,
+    name: 'Fillipinho',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
-final User gilmarUser =
-    User(id: 5, name: 'Gilmar', imageUrl: 'assets/images/porteiro.jpg');
+final User gilmarUser = User(
+    id: 5,
+    name: 'Gilmar',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
-final User tiagoUser =
-    User(id: 6, name: 'Tiago', imageUrl: 'assets/images/porteiro.jpg');
+final User tiagoUser = User(
+    id: 6,
+    name: 'Tiago',
+    imageUrl: 'assets/images/porteiro.jpg',
+    isOnline: true);
 
 List<User> favorites = [
   adryUser,

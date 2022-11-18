@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lobby_chat/blocs/message/message_bloc.dart';
+import 'package:lobby_chat/blocs/message/message_events.dart';
+import 'package:lobby_chat/blocs/message/message_state.dart';
+import 'package:lobby_chat/models/message_model.dart';
 import 'package:lobby_chat/models/user_model.dart';
 import 'package:lobby_chat/widgets/chat_message.dart';
-import '../models/message_model.dart';
+import 'package:intl/intl.dart';
 
 class ChatScreen extends StatefulWidget {
   final User user;
@@ -13,6 +18,19 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController messageController = TextEditingController();
+  late final bloc;
+  @override
+  void initState() {
+    super.initState();
+    bloc = BlocProvider.of<MessageBloc>(context);
+    bloc.add(LoadMessageEvent());
+  }
+
+  Future refreshData() async {
+    bloc.add(LoadMessageEvent());
+  }
+
   _buildMessage(Message message, bool isMe) {
     final ChatMessage msg = ChatMessage(message: message, isMe: isMe);
     if (isMe) {
@@ -52,14 +70,29 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: const Icon(Icons.photo),
           color: Theme.of(context).colorScheme.primary,
         ),
-        const Expanded(
+        Expanded(
             child: TextField(
+          controller: messageController,
           autocorrect: true,
           textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration.collapsed(hintText: 'Mensagem'),
+          decoration: const InputDecoration.collapsed(hintText: 'Mensagem'),
         )),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            if (messageController.text.isEmpty) {
+              return;
+            }
+            String formattedDate = DateFormat('hh:mm a').format(DateTime.now());
+            bloc.add(AddMessageEvent(
+              messages: Message(
+                  id: 1,
+                  sender: currentUser,
+                  time: formattedDate,
+                  text: messageController.text,
+                  unread: false),
+            ));
+            messageController.text = '';
+          },
           icon: const Icon(Icons.send),
           color: Theme.of(context).colorScheme.primary,
         )
@@ -105,13 +138,28 @@ class _ChatScreenState extends State<ChatScreen> {
                     borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30.0),
                         topRight: Radius.circular(30.0)),
-                    child: ListView.builder(
-                        reverse: true,
-                        itemCount: messages.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final Message message = messages[index];
-                          final bool isMe = message.sender.id == currentUser.id;
-                          return _buildMessage(message, isMe);
+                    child: BlocBuilder<MessageBloc, MessageState>(
+                        bloc: bloc,
+                        builder: (context, state) {
+                          if (state is MessageInitialState) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (state is MessageSucessState) {
+                            final List<Message> receivedMessages =
+                                state.messages;
+                            return ListView.builder(
+                                reverse: true,
+                                itemCount: receivedMessages.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final Message message =
+                                      receivedMessages[index];
+                                  final bool isMe =
+                                      message.sender.id == currentUser.id;
+                                  return _buildMessage(message, isMe);
+                                });
+                          }
+                          return Container();
                         }),
                   )),
             ),

@@ -31,9 +31,63 @@ class MessageRepository {
     return _messages;
   }
 
-  Message addMessage(Message message) {
-    _messages.add(message);
-    return message;
+  List<Message> loadRecentMessages() {
+    _messages.addAll([
+      Message(
+          id: 1,
+          sender: adryUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: false),
+      Message(
+          id: 1,
+          sender: queirozUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: dorinhoUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: fpUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: gilmarUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: tiagoUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: tiagoUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+      Message(
+          id: 1,
+          sender: tiagoUser,
+          time: '5:30 AM',
+          text: 'Oiii, chegou encomenda!',
+          unread: true),
+    ]);
+    return _messages;
+  }
+
+  List<Message> addMessage(Message message) {
+    _messages.insert(0, message);
+    return _messages;
   }
 
   Message findOneMessage(int id) {

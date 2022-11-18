@@ -1,35 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lobby_chat/blocs/message/message_bloc.dart';
-import 'package:lobby_chat/blocs/message/message_events.dart';
-import 'package:lobby_chat/blocs/message/message_state.dart';
+import 'package:lobby_chat/blocs/user/user_bloc.dart';
+import 'package:lobby_chat/blocs/user/user_events.dart';
+import 'package:lobby_chat/blocs/user/user_state.dart';
+import 'package:lobby_chat/models/user_model.dart';
 import 'package:lobby_chat/screens/chat_screen.dart';
 
-import '../models/message_model.dart';
-
-class RecentChats extends StatefulWidget {
-  const RecentChats({super.key, required int Function() onNext});
+class OnlineGateKeepers extends StatefulWidget {
+  const OnlineGateKeepers({super.key, required int Function() onNext});
 
   @override
-  State<RecentChats> createState() => _RecentChatsState();
+  State<OnlineGateKeepers> createState() => _OnlineGateKeepersState();
 }
 
-class _RecentChatsState extends State<RecentChats> {
+class _OnlineGateKeepersState extends State<OnlineGateKeepers> {
   late final bloc;
   @override
   void initState() {
     super.initState();
-    bloc = BlocProvider.of<MessageBloc>(context);
-    bloc.add(LoadRecentMessagesEvent());
+    bloc = BlocProvider.of<UserBloc>(context);
+    bloc.add(LoadOnlineUserEvent());
   }
 
   Future refreshData() async {
-    bloc.add(LoadMessageEvent());
+    bloc.add(LoadOnlineUserEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return SizedBox(
       child: Container(
         decoration: const BoxDecoration(
             color: Colors.white,
@@ -39,33 +38,31 @@ class _RecentChatsState extends State<RecentChats> {
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0)),
-          child: BlocBuilder<MessageBloc, MessageState>(
+          child: BlocBuilder<UserBloc, UserState>(
               bloc: bloc,
               builder: (context, state) {
-                if (state is MessageInitialState) {
+                if (state is UserInitialState) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
-                } else if (state is MessageSucessState) {
-                  final List<Message> recentChats = state.messages;
+                } else if (state is UserSucessState) {
+                  final List<User> onlineUsers = state.users;
                   return ListView.builder(
-                    itemCount: recentChats.length,
+                    itemCount: onlineUsers.length,
                     itemBuilder: (BuildContext context, int index) {
-                      final Message chat = recentChats[index];
+                      final User user = onlineUsers[index];
                       return GestureDetector(
                         onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => ChatScreen(user: chat.sender))),
+                                builder: (_) => ChatScreen(user: user))),
                         child: Container(
                           margin: const EdgeInsets.only(
                               top: 5.0, bottom: 5.0, right: 20.0),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20.0, vertical: 10.0),
                           decoration: BoxDecoration(
-                              color: chat.unread
-                                  ? const Color(0XFFFFEFEE)
-                                  : Colors.white,
+                              color: Colors.white,
                               borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(20.0)),
                               boxShadow: [
@@ -84,8 +81,7 @@ class _RecentChatsState extends State<RecentChats> {
                                 children: <Widget>[
                                   CircleAvatar(
                                     radius: 35.0,
-                                    backgroundImage:
-                                        AssetImage(chat.sender.imageUrl),
+                                    backgroundImage: AssetImage(user.imageUrl),
                                   ),
                                   const SizedBox(
                                     width: 10.0,
@@ -95,7 +91,7 @@ class _RecentChatsState extends State<RecentChats> {
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        chat.sender.name,
+                                        user.name,
                                         style: const TextStyle(
                                             color: Colors.grey,
                                             fontSize: 15.0,
@@ -104,52 +100,44 @@ class _RecentChatsState extends State<RecentChats> {
                                       const SizedBox(
                                         height: 5.0,
                                       ),
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.45,
-                                        child: Text(
-                                          chat.text,
-                                          style: const TextStyle(
-                                              color: Colors.blueGrey,
-                                              fontSize: 15.0,
-                                              fontWeight: FontWeight.w600),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      )
                                     ],
                                   )
                                 ],
                               ),
                               Column(
                                 children: <Widget>[
-                                  Text(
-                                    chat.time,
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
                                   const SizedBox(height: 5.0),
-                                  chat.unread
+                                  user.isOnline
                                       ? Container(
-                                          width: 50.0,
+                                          width: 60.0,
                                           height: 20.0,
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .primaryColor,
+                                              color: Colors.greenAccent[700],
                                               borderRadius:
                                                   BorderRadius.circular(30.0)),
                                           alignment: Alignment.center,
                                           child: const Text(
-                                            'NOVA',
+                                            'ONLINE',
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12.0,
                                                 fontWeight: FontWeight.bold),
                                           ))
-                                      : const Text('')
+                                      : Container(
+                                          width: 60.0,
+                                          height: 20.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey,
+                                              borderRadius:
+                                                  BorderRadius.circular(30.0)),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'OFFLINE',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold),
+                                          ))
                                 ],
                               )
                             ],
